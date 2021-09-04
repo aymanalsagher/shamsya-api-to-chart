@@ -1,23 +1,15 @@
-import logo from './logo.svg';
-import './App.css';
+import Chart from "./components/chart";
+import DatePicker from "./components/date-picker";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="flex flex-col items-center my-10 App">
+      <div className="mt-20">
+        <DatePicker />
+      </div>
+      <div className="mt-20">
+        <Chart />
+      </div>
     </div>
   );
 }
