@@ -15,7 +15,7 @@ export default function useWindowDimensions() {
 
   useEffect(() => {
     function handleResize() {
-      setTimeout(() => setWindowDimensions(getWindowDimensions()), 1500);
+      setTimeout(() => setWindowDimensions(getWindowDimensions()), 1800);
     }
 
     window.addEventListener("resize", handleResize);

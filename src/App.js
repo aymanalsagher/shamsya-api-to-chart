@@ -2,11 +2,25 @@ import { useEffect, useState } from "react";
 import { IsFirstRender } from "./hooks/disableFirstRenderHook";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
-import { DateRangePicker } from "react-date-range";
-// prettier-ignore
-import { BarChart,Bar,XAxis,YAxis,CartesianGrid,Tooltip,Legend} from "recharts";
+import DatePicker from "./components/DatePicker";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+} from "recharts";
 import axios from "axios";
 import useWindowDimensions from "./hooks/useWindowDimensions";
+import {
+  getWeight,
+  daysBetween,
+  getDaysPerTick,
+  tickFormatter,
+} from "./helpers";
+import MainTitle from "./components/MainTitle";
 
 function App() {
   const [startDate, setStartDate] = useState(new Date());
@@ -14,7 +28,7 @@ function App() {
   const [chartData, setChartData] = useState([]);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { height, width } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const [currentWidth, setCurrentWidth] = useState(window.innerWidth);
   const [totalTicks, setTotalTicks] = useState(10);
 
@@ -50,10 +64,10 @@ function App() {
           }
         )
         .then((res) => {
-          // Sort fetched data by date
           /** @type {Array} */
           let data = res.data.line_chart_data;
 
+          // Sort fetched data by date
           data.sort(function (a, b) {
             return a.submitted_at < b.submitted_at
               ? -1
@@ -87,6 +101,7 @@ function App() {
             tmpStartDate.toISOString().slice(0, 10);
             tmpEndDate.toISOString().slice(0, 10);
 
+            //Sort days range in an empty array
             daysRanges.push(
               tmpStartDate.toISOString().slice(0, 10) +
                 "/" +
@@ -119,10 +134,12 @@ function App() {
               sumQ4 = sumQ4 + getWeight(answerQ4.choice);
             });
 
+            //Sort Q2 and Q4 in different arrays
             questionTwoSum.push(sumQ2);
             questionFourSum.push(sumQ4);
           });
 
+          //Push all filtered results to create a proper data for the chart
           for (let i = 0; i < rangeData.length; i++) {
             chartData.push({
               daysRange: daysRanges[i],
@@ -138,34 +155,10 @@ function App() {
     }
   }, [endDate, isMount, chartData, width]);
 
-  const getWeight = (choiceNo) => {
-    switch (choiceNo) {
-      case 1:
-        return -1;
-      case 4:
-        return 1;
-      case 6:
-        return 0;
-
-      default: //Do nothing
-    }
-  };
-
   const handleSelect = (ranges) => {
     setStartDate(ranges.selection.startDate);
     setEndDate(ranges.selection.endDate);
     setChartData([]);
-  };
-
-  const treatAsUTC = (date) => {
-    var result = new Date(date);
-    result.setMinutes(result.getMinutes() - result.getTimezoneOffset());
-    return result;
-  };
-
-  const daysBetween = (startDate, endDate) => {
-    const millisecondsPerDay = 24 * 60 * 60 * 1000;
-    return (treatAsUTC(endDate) - treatAsUTC(startDate)) / millisecondsPerDay;
   };
 
   const adjustTicks = (daysNo) => {
@@ -182,18 +175,6 @@ function App() {
     }
   };
 
-  const getDaysPerTick = (daysNo, ticksNo) => {
-    if (daysNo <= ticksNo) {
-      return daysNo;
-    } else {
-      return Math.ceil(daysNo / ticksNo);
-    }
-  };
-
-  const tickFormatter = (value, i) => {
-    return i + 1;
-  };
-
   const chartWidth = () => {
     if (width <= 640) {
       return 450;
@@ -204,28 +185,20 @@ function App() {
     }
   };
 
-  const selectionRange = {
-    startDate,
-    endDate,
-    key: "selection",
-  };
-
   return (
-    <div className="flex flex-col items-center my-10 App">
-      {error && <div>{"Please choose a proper date"}</div>}
-      <div className="mt-20">
-        <DateRangePicker
-          ranges={[selectionRange]}
-          rangeColors={["#0B79EC"]}
-          maxDate={new Date()}
-          onChange={handleSelect}
-        />
-      </div>
+    <div className="flex flex-col items-center App">
+      <MainTitle title={"PLEASE PICK YOUR START AND END DATE"} />
+      <DatePicker
+        handleSelect={handleSelect}
+        startDate={startDate}
+        endDate={endDate}
+      />
+
       {!isLoading && (
-        <div className="mt-20">
+        <div className="mt-10">
           <BarChart
             width={chartWidth()}
-            height={400}
+            height={350}
             data={chartData}
             margin={{
               top: 5,
@@ -242,6 +215,16 @@ function App() {
             <Bar dataKey="Q2" fill="#0B79EC" />
             <Bar dataKey="Q4" fill="#88c1fc" />
           </BarChart>
+          <div>
+            <div className="flex justify-center">
+              <span className="mr-2 text-blue-600">Q2:</span>
+              <p>Reception and admission were</p>
+            </div>
+            <div className="flex justify-center">
+              <span className="mr-2 text-blue-400">Q4:</span>
+              <p>​The medical care you received was</p>
+            </div>
+          </div>
         </div>
       )}
     </div>
