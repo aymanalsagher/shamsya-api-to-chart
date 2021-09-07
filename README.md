@@ -10,9 +10,7 @@ npm start
 
 # How to use
 
-After pulling or downloading the code you will need to run this command:
-
-1st open the downloaded folder then run the next command in your CMD
+Download code then navigate to project folder, After that run the next command in your CMD
 
 ```sh
 npm install
