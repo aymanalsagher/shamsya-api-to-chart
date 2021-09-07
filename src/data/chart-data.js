@@ -56,7 +56,7 @@ export const data = [
   {
     date: "2000-10",
     uv: 2000,
-    pv: 9800,
+    pv: 12000,
     amt: 2290,
   },
   {
