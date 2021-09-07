@@ -60,7 +60,9 @@ function App() {
         .get(
           `https://staging.mymelior.com/v1/branches/1/progress?date_from=${fixedStartDate}&date_to=${fixedEndDate}`,
           {
-            headers: { Authorization: "Bearer SLSmxK17vjRInEWIiFQjwE1QIDfeSM" },
+            headers: {
+              Authorization: `Bearer ${process.env.REACT_APP_AUTHORIZATION}`,
+            },
           }
         )
         .then((res) => {
